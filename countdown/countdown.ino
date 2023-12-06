@@ -5,7 +5,7 @@
 
   By Bob Smith
   https://github.com/bethanysciences/countdown
-  28NOV2023
+  05DEC2023
 
   Components used (see readme for additional documentation)
   Arduino Nano Every https://content.arduino.cc/assets/Pinout-NANOevery_latest.pdf
@@ -45,7 +45,7 @@
 /*------------------------------------------------------------------------------------------------------*/
 /*                    Instantiate Piezo Amp & Buzzer Module                                                 */
 /*------------------------------------------------------------------------------------------------------*/
-int buzzPin = 14;                           // PAM8904 Piezo Amp signal pin
+int buzzPin = 14;                                       // PAM8904 Piezo Amp signal pin
 
 
 /*------------------------------------------------------------------------------------------------------*/
@@ -141,7 +141,7 @@ void readSDFile() {
     myFile = SD.open("assets.txt");
     if (myFile) {
         while (myFile.available()) {
-            memset(line, '\0', sizeof(line));         // clear entry
+            memset(line, '\0', sizeof(line));           // clear entry
             myFile.readBytesUntil(',', line, sizeof(line));
             strcpy(ASSETS[asset],line);
             asset++;
@@ -149,7 +149,7 @@ void readSDFile() {
         myFile.close();
     }
     else display.print("error");
-    tot_assets = asset -1;                            // drop last trash entry
+    tot_assets = asset -1;                              // drop last trash entry
 }
 
 
@@ -185,6 +185,13 @@ void loop() {
             sevseg0.drawColon(true);
             sevseg0.writeDisplay();    
             
+            assetCycle.read();
+            if(assetCycle.wasReleased()) {
+                asset ++;
+                if (asset >= tot_assets) asset = 0;
+                display.print(ASSETS[asset]);
+            }
+
             set15.read();
             if(set15.wasReleased()) {
                 cd.start(time15);
@@ -225,15 +232,15 @@ void loop() {
           sevseg0.print(displayValue);
           sevseg0.drawColon(true);
           sevseg0.writeDisplay();            
-          tone(buzzPin, 330, 500);                   // 2.0khz for 500ms
+          tone(buzzPin, 330, 500);                      // 2.0khz for 500ms
           delay(500);
-          tone(buzzPin, 523, 500);                   // 2.1khz for 500ms
+          tone(buzzPin, 523, 500);                      // 2.1khz for 500ms
           delay(500);
         }
         cd.stop();
     }
 
-    delay(10);                                        // let's not overwhelm the MCU
+    delay(10);                                          // let's not overwhelm the MCU
 }
 
 bool PollEncoderSwitch() {
